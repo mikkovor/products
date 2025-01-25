@@ -23,5 +23,15 @@ namespace Products.Infrastructure
             await productDbContext.SaveChangesAsync();
             return product?.ToViewProduct();
         }
+
+        public async Task<bool> Delete(int id)
+        {
+            var product = await productDbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (product == null) return false;
+
+            productDbContext.Products.Remove(product);
+            await productDbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

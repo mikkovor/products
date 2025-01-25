@@ -24,6 +24,7 @@ namespace Products.Tests
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             response.Headers.Location!.ToString().EndsWith($"/api/products/{product!.Id}").Should().BeTrue();
+
             product.Should().NotBeNull();
             product.Id.Should().BeGreaterThan(0);
             product.Name.Should().Be("Test Product");
@@ -31,16 +32,15 @@ namespace Products.Tests
         }
 
         [Fact]
-        public async Task Create_ShouldReturnProductById()
+        public async Task GetById_ShouldReturnProductById()
         {
             var createProduct = new CreateProduct("Test Product", 99.99m);
             var response = await _client.PostAsJsonAsync("/api/products", createProduct);
-            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
 
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
             product.Should().NotBeNull();
 
             var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"/api/products/{product!.Id}");
-
             foundProduct.Should().NotBeNull();
             foundProduct!.Id.Should().Be(product.Id);
             foundProduct.Name.Should().Be("Test Product");
@@ -48,16 +48,51 @@ namespace Products.Tests
         }
 
         [Fact]
-        public async Task Create_ShouldReturnNotFoundWhenProductIsNotFound()
+        public async Task GetById_ShouldReturnNotFoundWhenProductIsNotFound()
         {
             var createProduct = new CreateProduct("Test Product", 99.99m);
             var response = await _client.PostAsJsonAsync("/api/products", createProduct);
-            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
 
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
             product.Should().NotBeNull();
 
             var notFound = await _client.GetAsync($"/api/products/{product!.Id + 1}");
             notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldReturn204StatusCodeWhenDeleted()
+        {
+            var createProduct = new CreateProduct("Test Product", 99.99m);
+            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
+
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
+            product.Should().NotBeNull();
+
+            var deletedResponse = await _client.DeleteAsync($"/api/products/{product!.Id}");
+            deletedResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var notFound = await _client.GetAsync($"/api/products/{product!.Id}");
+            notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldReturnNotFoundWhenRequestedProductToBeDeletedItNotFound()
+        {
+            var createProduct = new CreateProduct("Test Product", 99.99m);
+            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
+
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
+            product.Should().NotBeNull();
+
+            var deletedResponse = await _client.DeleteAsync($"/api/products/{product!.Id + 1}");
+            deletedResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"/api/products/{product!.Id}");
+            foundProduct.Should().NotBeNull();
+            foundProduct!.Id.Should().Be(product.Id);
+            foundProduct.Name.Should().Be("Test Product");
+            foundProduct.Price.Should().Be(99.99m);
         }
     }
 }

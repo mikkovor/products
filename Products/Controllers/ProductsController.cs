@@ -37,11 +37,11 @@ namespace Products.Controllers
             return CreatedAtRoute(nameof(GetById), new { id = product.Id }, product);
         }
 
-        [HttpDelete(Name = "Delete")]
-        [Route("{id:int}")]
-        public Task<IActionResult> Delete(int id)
+        [HttpDelete("{id:int}", Name = "Delete")]
+        public async Task<IActionResult> Delete(int id)
         {
-            throw new NotImplementedException();
+            var isDeleted = await _productService.Delete(id);
+            return isDeleted ? NoContent() : NotFound();
         }
     }
 }
