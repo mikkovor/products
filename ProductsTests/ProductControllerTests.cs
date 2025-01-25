@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Products.Dtos;
 using Products.IntegrationTests;
+using Products.Models.Dtos;
 using System.Net;
 using System.Net.Http.Json;
 

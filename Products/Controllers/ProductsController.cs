@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Products.Dtos;
 using Products.Infrastructure;
+using Products.Models.Dtos;
+using Products.Models.Requests;
 
 namespace Products.Controllers
 {
@@ -18,13 +19,13 @@ namespace Products.Controllers
         }
 
         [HttpGet(Name = "Get")]
-        public Task<IActionResult> Get()
+        public async Task<ActionResult<List<ViewProduct>>> Get([FromQuery] ProductsRequest productsRequest)
         {
-            throw new NotImplementedException();
+            return await _productService.Get(productsRequest);
         }
 
         [HttpGet("{id:int}", Name = "GetById")]
-        public async Task<IActionResult> GetById([FromRoute] int id)
+        public async Task<ActionResult<ViewProduct>> GetById([FromRoute] int id)
         {
             var product = await _productService.GetById(id);
             return product == null ? NotFound() : Ok(product);

@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Products.Dtos;
 using Products.Entities;
 using Products.Extensions.Mapping;
 using Products.Infrastructure.Persistence;
+using Products.Models.Dtos;
+using Products.Models.Requests;
 
 namespace Products.Infrastructure
 {
@@ -32,6 +33,34 @@ namespace Products.Infrastructure
             productDbContext.Products.Remove(product);
             await productDbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<ViewProduct>> Get(ProductsRequest productsRequest)
+        {
+            var query = productDbContext.Products.AsQueryable();
+
+            query = productsRequest.SortBy.ToLower() switch
+            {
+                // ProductsRequest defaults to name
+                "name" => productsRequest.SortDescending
+                    ? query.OrderByDescending(p => p.Name)
+                    : query.OrderBy(p => p.Name),
+                "price" => productsRequest.SortDescending
+                    ? query.OrderByDescending(p => p.Price)
+                    : query.OrderBy(p => p.Price),
+                _ => throw new ArgumentException($"Cannot sort products by {productsRequest.SortBy}")
+            };
+
+            var products = await query.ToListAsync();
+
+            List<ViewProduct> viewProducts = [];
+
+            foreach (var product in products)
+            {
+                viewProducts.Add(product.ToViewProduct());
+            }
+
+            return viewProducts;
         }
     }
 }

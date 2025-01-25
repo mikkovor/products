@@ -7,5 +7,12 @@ Content-Type: application/json
    "name": "Test Product",
    "price": 99.99
 }
-
 ###
+GET {{Products_HostAddress}}/api/products/
+Accept: application/json
+###
+GET {{Products_HostAddress}}/api/products/1
+Accept: application/json
+###
+DELETE {{Products_HostAddress}}/api/products/1
+Accept: application/json

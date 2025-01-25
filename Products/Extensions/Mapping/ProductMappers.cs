@@ -1,5 +1,5 @@
-﻿using Products.Dtos;
-using Products.Entities;
+﻿using Products.Entities;
+using Products.Models.Dtos;
 
 namespace Products.Extensions.Mapping
 {
