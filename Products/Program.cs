@@ -32,3 +32,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+// For testing
+public partial class Program
+{ }

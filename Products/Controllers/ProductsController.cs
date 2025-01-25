@@ -23,9 +23,8 @@ namespace Products.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpGet(Name = "GetById")]
-        [Route("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{id:int}", Name = "GetById")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
             return Ok(id);
         }
