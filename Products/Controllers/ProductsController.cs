@@ -1,37 +1,47 @@
 using Microsoft.AspNetCore.Mvc;
+using Products.Dtos;
+using Products.Infrastructure;
 
 namespace Products.Controllers
 {
     [ApiController]
-    [Route("products")]
+    [Route("api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;
+        private readonly ProductService _productService;
 
-        public ProductsController(ILogger<ProductsController> logger)
+        public ProductsController(ILogger<ProductsController> logger, ProductService productService)
         {
             _logger = logger;
+            _productService = productService;
         }
 
         [HttpGet(Name = "Get")]
-        public Task<ActionResult<>> Get()
+        public Task<IActionResult> Get()
         {
+            throw new NotImplementedException();
         }
 
         [HttpGet(Name = "GetById")]
-        [Route("/{id:int}")]
-        public Task<ActionResult<>> GetById(int id)
+        [Route("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
+            return Ok(id);
         }
 
         [HttpPost(Name = "Create")]
-        public Task<ActionResult<>> Create(int id)
+        public async Task<ActionResult<ViewProduct>> Create([FromBody] CreateProduct createProduct)
         {
+            var product = await _productService.Create(createProduct);
+            return CreatedAtRoute(nameof(GetById), new { id = product.Id }, product);
         }
 
         [HttpDelete(Name = "Delete")]
-        public Task<ActionResult<>> Delete(int id)
+        [Route("{id:int}")]
+        public Task<IActionResult> Delete(int id)
         {
+            throw new NotImplementedException();
         }
     }
 }

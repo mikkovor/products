@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Products.Infrastructure;
 using Products.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddScoped<ProductService>();
+
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
     options.UseInMemoryDatabase("Products");
