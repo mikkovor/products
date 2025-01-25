@@ -3,8 +3,6 @@ using Products.Dtos;
 using Products.IntegrationTests;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace Products.Tests
 {
@@ -21,19 +19,45 @@ namespace Products.Tests
         public async Task Create_ShouldReturnCreatedProduct()
         {
             var createProduct = new CreateProduct("Test Product", 99.99m);
-            var content = new StringContent(
-                JsonSerializer.Serialize(createProduct),
-                Encoding.UTF8,
-                "application/json");
-
-            var response = await _client.PostAsync("/api/products", content);
+            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
             var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             response.Headers.Location!.ToString().EndsWith($"/api/products/{product!.Id}").Should().BeTrue();
             product.Should().NotBeNull();
+            product.Id.Should().BeGreaterThan(0);
             product.Name.Should().Be("Test Product");
             product.Price.Should().Be(99.99m);
+        }
+
+        [Fact]
+        public async Task Create_ShouldReturnProductById()
+        {
+            var createProduct = new CreateProduct("Test Product", 99.99m);
+            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
+
+            product.Should().NotBeNull();
+
+            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"/api/products/{product!.Id}");
+
+            foundProduct.Should().NotBeNull();
+            foundProduct!.Id.Should().Be(product.Id);
+            foundProduct.Name.Should().Be("Test Product");
+            foundProduct.Price.Should().Be(99.99m);
+        }
+
+        [Fact]
+        public async Task Create_ShouldReturnNotFoundWhenProductIsNotFound()
+        {
+            var createProduct = new CreateProduct("Test Product", 99.99m);
+            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
+            var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
+
+            product.Should().NotBeNull();
+
+            var notFound = await _client.GetAsync($"/api/products/{product!.Id + 1}");
+            notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
     }
 }

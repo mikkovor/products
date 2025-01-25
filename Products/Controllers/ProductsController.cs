@@ -26,7 +26,8 @@ namespace Products.Controllers
         [HttpGet("{id:int}", Name = "GetById")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            return Ok(id);
+            var product = await _productService.GetById(id);
+            return product == null ? NotFound() : Ok(product);
         }
 
         [HttpPost(Name = "Create")]

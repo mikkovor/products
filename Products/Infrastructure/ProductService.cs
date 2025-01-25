@@ -1,4 +1,5 @@
-﻿using Products.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
+using Products.Dtos;
 using Products.Entities;
 using Products.Extensions.Mapping;
 using Products.Infrastructure.Persistence;
@@ -14,6 +15,13 @@ namespace Products.Infrastructure
             await productDbContext.Products.AddAsync(product);
             await productDbContext.SaveChangesAsync();
             return product.ToViewProduct();
+        }
+
+        public async Task<ViewProduct?> GetById(int id)
+        {
+            var product = await productDbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            await productDbContext.SaveChangesAsync();
+            return product?.ToViewProduct();
         }
     }
 }
