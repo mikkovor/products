@@ -74,7 +74,7 @@ namespace Products.IntegrationTests
         }
 
         [Fact]
-        public async Task Delete_ShouldReturn204StatusCodeWhenDeleted()
+        public async Task Delete_ShouldSuccessfullyDeleteProduct()
         {
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
@@ -87,7 +87,7 @@ namespace Products.IntegrationTests
         }
 
         [Fact]
-        public async Task Delete_ShouldReturnNotFoundWhenRequestedProductToBeDeletedItNotFound()
+        public async Task Delete_ShouldReturnNotFoundWhenRequestedProductToBeDeletedIsNotFound()
         {
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
