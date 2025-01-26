@@ -2,8 +2,8 @@
 using Products.Entities;
 using Products.Extensions.Mapping;
 using Products.Infrastructure.Persistence;
-using Products.Models.Dtos;
 using Products.Models.Requests;
+using Products.Models.Responses;
 
 namespace Products.Infrastructure
 {

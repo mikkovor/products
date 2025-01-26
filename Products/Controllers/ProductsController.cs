@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Products.Infrastructure;
-using Products.Models.Dtos;
 using Products.Models.Requests;
+using Products.Models.Responses;
 
 namespace Products.Controllers
 {

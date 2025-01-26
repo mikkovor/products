@@ -1,5 +1,5 @@
 ﻿using Products.Entities;
-using Products.Models.Dtos;
+using Products.Models.Responses;
 
 namespace Products.Extensions.Mapping
 {

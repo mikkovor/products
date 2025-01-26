@@ -1,4 +1,4 @@
-﻿namespace Products.Models.Dtos
+﻿namespace Products.Models.Responses
 {
     public record CreateProduct(string Name, decimal Price);
 }
