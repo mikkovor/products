@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Products.Infrastructure;
 using Products.Models.Requests;
@@ -8,7 +9,8 @@ namespace Products.Controllers
     [ApiController]
     [Tags("Products")]
     [Produces("application/json")]
-    [Route("api/products")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/products")]
     public class ProductsController : ControllerBase
     {
         private readonly ProductService _productService;
@@ -25,6 +27,7 @@ namespace Products.Controllers
         /// <returns>List of products</returns>
         /// <response code="200">Returns the list of products</response>
         [ProducesResponseType(typeof(List<ViewProduct>), StatusCodes.Status200OK)]
+        [MapToApiVersion("1.0")]
         [HttpGet(Name = "Get")]
         public async Task<ActionResult<List<ViewProduct>>> Get([FromQuery] ProductsRequest productsRequest)
         {
@@ -40,6 +43,7 @@ namespace Products.Controllers
         /// <response code="404">Product not found</response>
         [ProducesResponseType(typeof(ViewProduct), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [MapToApiVersion("1.0")]
         [HttpGet("{id:int}", Name = "GetById")]
         public async Task<ActionResult<ViewProduct>> GetById([FromRoute] int id)
         {
@@ -56,6 +60,7 @@ namespace Products.Controllers
         /// <response code="400">If the product information is invalid</response>
         [ProducesResponseType(typeof(ViewProduct), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [MapToApiVersion("1.0")]
         [HttpPost(Name = "Create")]
         public async Task<ActionResult<ViewProduct>> Create([FromBody] CreateProduct createProduct)
         {
@@ -71,6 +76,7 @@ namespace Products.Controllers
         /// <response code="404">Product not found</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [MapToApiVersion("1.0")]
         [HttpDelete("{id:int}", Name = "Delete")]
         public async Task<IActionResult> Delete(int id)
         {

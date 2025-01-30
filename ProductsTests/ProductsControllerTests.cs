@@ -16,6 +16,7 @@ namespace Products.IntegrationTests
         private readonly ProductDbContext _context;
         private const string defaultProductName = "Test Product";
         private const decimal defaultProductPrice = 99.99m;
+        private const string productsV1Route = "/api/v1/products";
 
         public ProductsControllerTests(CustomWebApplicationFactory<Program> factory)
         {
@@ -38,11 +39,11 @@ namespace Products.IntegrationTests
         public async Task Create_ShouldReturnCreatedProduct()
         {
             var createProduct = new CreateProduct(defaultProductName, defaultProductPrice);
-            var response = await _client.PostAsJsonAsync("/api/products", createProduct);
+            var response = await _client.PostAsJsonAsync(productsV1Route, createProduct);
             var product = await response.Content.ReadFromJsonAsync<ViewProduct>();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
-            response.Headers.Location!.ToString().EndsWith($"/api/products/{product!.Id}").Should().BeTrue();
+            response.Headers.Location!.ToString().EndsWith($"{productsV1Route}/{product!.Id}").Should().BeTrue();
 
             product.Should().NotBeNull();
             product.Id.Should().BeGreaterThan(0);
@@ -56,7 +57,7 @@ namespace Products.IntegrationTests
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
 
-            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"/api/products/{product!.Id}");
+            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"{productsV1Route}/{product!.Id}");
             foundProduct.Should().NotBeNull();
             foundProduct!.Id.Should().Be(product.Id);
             foundProduct.Name.Should().Be(defaultProductName);
@@ -69,7 +70,7 @@ namespace Products.IntegrationTests
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
 
-            var notFound = await _client.GetAsync($"/api/products/{product!.Id + 1}");
+            var notFound = await _client.GetAsync($"{productsV1Route}/{product!.Id + 1}");
             notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
@@ -79,10 +80,10 @@ namespace Products.IntegrationTests
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
 
-            var deletedResponse = await _client.DeleteAsync($"/api/products/{product!.Id}");
+            var deletedResponse = await _client.DeleteAsync($"{productsV1Route}/{product!.Id}");
             deletedResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            var notFound = await _client.GetAsync($"/api/products/{product!.Id}");
+            var notFound = await _client.GetAsync($"{productsV1Route}/{product!.Id}");
             notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
@@ -92,10 +93,10 @@ namespace Products.IntegrationTests
             var product = await CreateTestProduct();
             product.Should().NotBeNull();
 
-            var deletedResponse = await _client.DeleteAsync($"/api/products/{product!.Id + 1}");
+            var deletedResponse = await _client.DeleteAsync($"{productsV1Route}/{product!.Id + 1}");
             deletedResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"/api/products/{product!.Id}");
+            var foundProduct = await _client.GetFromJsonAsync<ViewProduct>($"{productsV1Route}/{product!.Id}");
             foundProduct.Should().NotBeNull();
             foundProduct!.Id.Should().Be(product.Id);
             foundProduct.Name.Should().Be(defaultProductName);
@@ -109,7 +110,7 @@ namespace Products.IntegrationTests
 
             var createProduct2 = await CreateTestProduct("Another Product", 10.99m);
 
-            var products = await _client.GetFromJsonAsync<List<ViewProduct>>("/api/products");
+            var products = await _client.GetFromJsonAsync<List<ViewProduct>>(productsV1Route);
 
             products.Should().NotBeNull();
             products!.Count.Should().Be(2);
@@ -125,7 +126,7 @@ namespace Products.IntegrationTests
             await CreateTestProduct();
             await CreateTestProduct("Another Product", 10.99m);
 
-            var products = await _client.GetFromJsonAsync<List<ViewProduct>>(CreateUriWithQueryParameters(productsRequest, "/api/products"));
+            var products = await _client.GetFromJsonAsync<List<ViewProduct>>(CreateUriWithQueryParameters(productsRequest, productsV1Route));
 
             products.Should().NotBeNull();
             products!.Count.Should().Be(2);
@@ -141,7 +142,7 @@ namespace Products.IntegrationTests
             await CreateTestProduct();
             await CreateTestProduct("Another Product", 10.99m);
 
-            var products = await _client.GetFromJsonAsync<List<ViewProduct>>(CreateUriWithQueryParameters(productsRequest, "/api/products"));
+            var products = await _client.GetFromJsonAsync<List<ViewProduct>>(CreateUriWithQueryParameters(productsRequest, productsV1Route));
 
             products.Should().NotBeNull();
             products!.Count.Should().Be(2);
@@ -157,7 +158,7 @@ namespace Products.IntegrationTests
             await CreateTestProduct();
             await CreateTestProduct("Another Product", 10.99m);
 
-            var response = await _client.GetAsync(CreateUriWithQueryParameters(productsRequest, "/api/products"));
+            var response = await _client.GetAsync(CreateUriWithQueryParameters(productsRequest, productsV1Route));
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
             var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
@@ -180,7 +181,7 @@ namespace Products.IntegrationTests
 
         private async Task<ViewProduct?> CreateTestProduct(string name = defaultProductName, decimal price = defaultProductPrice)
         {
-            var response = await _client.PostAsJsonAsync("/api/products", new CreateProduct(name, price));
+            var response = await _client.PostAsJsonAsync(productsV1Route, new CreateProduct(name, price));
             return await response.Content.ReadFromJsonAsync<ViewProduct>();
         }
     }
